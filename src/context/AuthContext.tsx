@@ -3,16 +3,18 @@ import React, { createContext, useReducer, useContext } from 'react';
 import Cookies from 'js-cookie';
 type AuthState = {
   email: string | null;
+  id: string;
   isAuthenticated: boolean;
 };
 
 const initialState: AuthState = {
   email: null,
+  id: '',
   isAuthenticated: false,
 };
 
 type AuthAction =
-  | { type: 'SET_AUTH', payload: { email: string } }
+  | { type: 'SET_AUTH', payload: { id: string, email: string } }
   | { type: 'LOGOUT' };
 
 const AuthContext = createContext<{ state: AuthState, dispatch: React.Dispatch<AuthAction> } | undefined>(undefined);
@@ -22,6 +24,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       case 'SET_AUTH':
       return {
         ...state,
+        id: action.payload.id,
         email: action.payload.email,
         isAuthenticated: true,
       };

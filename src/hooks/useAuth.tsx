@@ -15,7 +15,7 @@ const useAuth = () => {
         } else {
             const decoded = decodeJWT(accessToken as string);
             if (decoded) {
-                dispatch({ type: "SET_AUTH", payload: { email: decoded.email } });
+                dispatch({ type: "SET_AUTH", payload: { id: decoded.userId, email: decoded.email } });
                 setIsAuthenticated(true);
             }
         }

@@ -1,8 +1,9 @@
 // app/utils/api.ts
+import { EXPRESS_VERSION_URL } from "@/config";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export const baseURL = "http://localhost:4000/api/v1";
+export const baseURL = EXPRESS_VERSION_URL
 // Set base URL for API requests
 const api = axios.create({
   baseURL: baseURL,

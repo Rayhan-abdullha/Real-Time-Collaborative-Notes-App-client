@@ -1,59 +1,108 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import api, { baseURL } from "@/utils/api";
 import { io } from "socket.io-client";
-import { useParams } from "next/navigation";
+import EditNote from "@/app/components/note/EditNote";
+import { BACKEND_BASE_URL } from "@/config";
+import toast from "react-hot-toast";
+import { AuthErrorType } from "@/lib/ErrorType";
 
-const socket = io("http://localhost:4000");
+const socket = io(BACKEND_BASE_URL);
 
-export default function Page() {
+function NoteDetails() {
+  const [noteDetails, setNoteDetails] = useState<{ title: string; content: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
+
   const params = useParams();
   const id = params.id as string;
-  const noteId = id ? id[1] : ""; 
-  const [note, setNote] = useState<{ title: string; content: string }>({ title: "", content: "" });
+  const noteId = id ? id[1] : "";
 
   useEffect(() => {
-    socket.emit("joinNote", { noteId });
+    if (!noteId) return;
+    const fetchTask = async () => {
+      try {
+        const response = await api.get(`${baseURL}/notes/${noteId}`);
+        setNoteDetails(response.data.data);
+        setLoading(false);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("Error fetching task details:", error);
+        }
+      }
+    };
+    fetchTask();
 
-    // Listen for updates to the note
+    socket.emit("joinNote", { noteId });
     socket.on("noteUpdated", (updatedNote) => {
-      setNote(updatedNote);
+      setNoteDetails(updatedNote);
     });
 
-    // Cleanup the socket event listener when component unmounts
     return () => {
       socket.off("noteUpdated");
     };
+
   }, [noteId]);
 
-  const handleEdit = (field: "title" | "content", value: string) => {
-    const updatedNote = { ...note, [field]: value };
-    setNote(updatedNote);
-    socket.emit("editNote", { noteId, updateData: updatedNote });
+
+  const deleteNote = async () => {
+    try {
+      const response = await api.delete(`${baseURL}/notes/${noteId}`);
+      if (response.status === 200) {
+        toast.success("Note deleted successfully");
+        router.push("/");
+      }
+    } catch (error) {
+      toast.error((error as AuthErrorType).response?.data?.message || "Something went wrong");
+    }
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#5f27cd]"></div>
+      </div>
+    );
+  }
+
+  if (!noteDetails) {
+    return <div className="text-center text-red-500">Note not found</div>;
+  }
+
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 text-center">Collaborative Notes</h1>
+    <div className="max-w-3xl mx-auto p-8 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-6">📝 Task Details</h1>
+      <div className="bg-white p-8 rounded-lg shadow-lg space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900">{noteDetails?.title}</h2>
+          <p className="text-gray-600 text-lg mt-2">{noteDetails?.content}</p>
+        </div>
 
-      {/* Display Title and Content */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Title</label>
-        <input
-          type="text"
-          value={note.title}
-          onChange={(e) => handleEdit("title", e.target.value)}
-          className="w-full p-2 mb-3 border rounded-md"
-        />
+        <div className="flex justify-end space-x-4">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-white bg-blue-100 rounded-lg transition-all duration-300 hover:bg-blue-600"
+          >
+            Edit Note
+          </button>
+          <button
+            onClick={deleteNote}
+            className="px-6 py-2 text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-500 hover:text-white transition duration-300"
+          >
+            Delete Task
+          </button>
+        </div>
       </div>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Content</label>
-        <textarea
-          value={note.content}
-          onChange={(e) => handleEdit("content", e.target.value)}
-          className="w-full p-2 h-40 border rounded-md"
-        />
-      </div>
+      <EditNote
+        noteDetails={noteDetails}
+        noteId={noteId}
+        isOpen={isModalOpen}
+        onClose={setIsModalOpen}
+      />
     </div>
   );
 }
+
+export default NoteDetails;

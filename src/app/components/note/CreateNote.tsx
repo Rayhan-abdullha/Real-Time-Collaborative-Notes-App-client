@@ -1,18 +1,21 @@
 'use client'
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { CustomErrorType } from '@/lib/ErrorType';
 import api, { baseURL } from '@/utils/api';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 const CreateNote = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
-    // Creating note object
     const note = {
       title,
       content,
@@ -22,11 +25,15 @@ const CreateNote = () => {
       await api.post(`${baseURL}/notes`, note);
       setTitle('');
       setContent('');
+      router.push('/');
+      toast.success('Note created successfully');
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setError(error?.message);
+        setError(error?.message || 'Something went wrong');
+        toast.error(error?.message || 'Something went wrong');
       } else {
-        setError('Something went wrong');
+        setError((error as CustomErrorType).response?.data?.message || 'Something went wrong');
+        toast.error((error as CustomErrorType).response?.data?.message || 'Something went wrong');
       }
     } finally {
       setLoading(false);
@@ -63,7 +70,7 @@ const CreateNote = () => {
             loading ? 'bg-gray-500' : 'bg-[#5f27cd] hover:bg-[#4e18ba]'
           } focus:outline-none focus:ring-2 focus:ring-[#5f27cd] focus:ring-opacity-50`}
         >
-          {loading ? 'Saving...' : 'Save Note'}
+          {loading ? <LoadingSpinner className="w-5 h-5 mr-2" /> : 'Save Note'}
         </button>
       </form>
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}

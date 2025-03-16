@@ -1,4 +1,2 @@
 export { default as Logo } from "./Logo";
-export * from "./Icons";
-export * from "./core";
-export * from "./shared";
+export * from "./Icons"

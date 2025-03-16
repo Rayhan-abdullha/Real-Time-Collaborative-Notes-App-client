@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { useAuthContext } from "@/context/AuthContext";
+import toast from "react-hot-toast";
+import { AuthErrorType } from "@/lib/ErrorType";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,20 +22,22 @@ const Login = () => {
       const response = await api.post("/auth/login", { email, password });
       const { accessToken } = response.data.data;
       Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'Strict' });
-
+      toast.success("Login successful");
       dispatch({ 
         type: 'SET_AUTH',
         payload: {
-          email
+          email,
+          id: response.data.data._id
         }
       });
-
       router.push("/profile");
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        setError(err.message || "Something went wrong");
+        toast.error(err.message || "Something went wrong");
       } else {
-        setError("Something went wrong");
+        setError((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
+        toast.error((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
       }
     }
   };

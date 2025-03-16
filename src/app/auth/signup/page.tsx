@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { AuthErrorType } from "@/lib/ErrorType";
+import toast from "react-hot-toast";
 
 const Signup = () => {
   const [state, setState] = useState({
@@ -27,13 +29,17 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await api.post("/auth/register", { email, password, name });
+      toast.success("Signup successful");
       Cookies.set("accessToken", response.data.data.accessToken);
       router.push("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        setError(err.message || "Something went wrong");
+        toast.error(err.message || "Something went wrong");
+      } else {
+        setError((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
+        toast.error((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
       }
-      setError((err as { response: { data: { message: string; details: { message: string }[] } } }).response?.data?.details[0].message || "Something went wrong");
     }
     finally {
       setLoading(false);
