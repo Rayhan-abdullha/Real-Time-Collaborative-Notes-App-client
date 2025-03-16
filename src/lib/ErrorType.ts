@@ -1,0 +1,1 @@
+export interface CustomErrorType { response: { data: { message: string } } }
