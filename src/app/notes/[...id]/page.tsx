@@ -7,16 +7,29 @@ import EditNote from "@/app/components/note/EditNote";
 import { BACKEND_BASE_URL } from "@/config";
 import toast from "react-hot-toast";
 import { AuthErrorType } from "@/lib/ErrorType";
+import { formatUpdatedAt } from "@/lib";
+import { IAuthor } from "@/app/profile/page";
 
 const socket = io(BACKEND_BASE_URL);
 
-function NoteDetails() {
-  const [noteDetails, setNoteDetails] = useState<{ title: string; content: string } | null>(null);
+export interface INote {
+  author: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const NoteDetails = () => {
+  const [noteDetails, setNoteDetails] = useState<INote | null>(null);
+  const [author, setAuthor] = useState<IAuthor | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [noteError, setNoteError] = useState<string | null>(null);  
+  const [authorError, setAuthorError] = useState<string | null>(null);
   const router = useRouter();
-
-  const {id} = useParams();
+  
+  const { id } = useParams();
   const noteId = id ? id[0] : "";
 
   useEffect(() => {
@@ -28,8 +41,10 @@ function NoteDetails() {
         setLoading(false);
       } catch (error) {
         if (error instanceof Error) {
+          setNoteError("Error fetching note details");
           console.error("Error fetching task details:", error);
         }
+        setLoading(false);
       }
     };
     fetchTask();
@@ -42,9 +57,22 @@ function NoteDetails() {
     return () => {
       socket.off("noteUpdated");
     };
-
   }, [noteId]);
 
+  useEffect(() => {
+    if (noteDetails?.author) {
+      const fetchAuthor = async () => {
+        try {
+          const response = await api.get(`${baseURL}/auth/user/${noteDetails.author}`);
+          setAuthor(response.data.data);
+        } catch (error) {
+          setAuthorError("Error fetching author details");
+          console.error("Error fetching author details:", error);
+        }
+      };
+      fetchAuthor();
+    }
+  }, [noteDetails?.author]);
 
   const deleteNote = async () => {
     try {
@@ -66,6 +94,10 @@ function NoteDetails() {
     );
   }
 
+  if (noteError) {
+    return <div className="text-center text-red-500">{noteError}</div>;
+  }
+
   if (!noteDetails) {
     return <div className="text-center text-red-500">Note not found</div>;
   }
@@ -73,26 +105,38 @@ function NoteDetails() {
   return (
     <div className="max-w-3xl mx-auto p-8 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-6">📝 Task Details</h1>
-      <div className="bg-white p-8 rounded-lg shadow-lg space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900">{noteDetails?.title}</h2>
-          <p className="text-gray-600 text-lg mt-2">{noteDetails?.content}</p>
+      <div className="bg-white p-10 rounded-2xl shadow-2xl space-y-6 border border-gray-200">
+      <div className="space-y-4">
+        <h2 className="text-4xl font-bold text-gray-900">{noteDetails?.title}</h2>
+        <div className="flex flex-col gap-y-2 text-sm text-gray-500">
+          <p className="italic font-sm">{formatUpdatedAt(noteDetails?.updatedAt)}</p>
+          {authorError ? (
+            <p className="text-red-500">{authorError}</p>
+            ) : author ? (
+                // author name will be italic
+            <p className="italic font-sm">Author: <>{author.name}</></p>
+          ) : (
+            <p className="text-sm">Author: Loading...</p>
+          )}
         </div>
+        <p className="text-gray-700 text-lg first-letter:uppercase leading-relaxed border-l-4 border-purple-500 pl-4">
+          {noteDetails?.content}
+        </p>
 
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 text-sm font-medium text-purple-600 hover:text-white bg-purple-100 rounded-lg transition-all duration-300 hover:bg-[#5f27cd]"
-          >
-            Edit Note
-          </button>
-          <button
-            onClick={deleteNote}
-            className="px-6 py-2 text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-500 hover:text-white transition duration-300"
-          >
-            Delete Task
-          </button>
-        </div>
+      <div className="flex justify-between space-x-4 mt-6">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-6 py-2 text-sm font-medium text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 transition-all duration-300"
+        >
+          Edit Note
+        </button>
+        <button
+          onClick={deleteNote}
+          className="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-300"
+        >
+          Delete Task
+        </button>
+      </div>
       </div>
       <EditNote
         noteDetails={noteDetails}
@@ -100,8 +144,9 @@ function NoteDetails() {
         isOpen={isModalOpen}
         onClose={setIsModalOpen}
       />
+      </div>
     </div>
   );
-}
+};
 
 export default NoteDetails;

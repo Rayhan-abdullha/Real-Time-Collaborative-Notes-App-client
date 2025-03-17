@@ -64,7 +64,7 @@ const EditNote = ({ noteDetails, noteId,isOpen, onClose }: IProps) => {
             onClick={() => onClose(false)}
             className="px-4 py-2 bg-[#5f27cd] text-white rounded-md hover:bg-[#4d17ba] transition duration-300 ease-in-out"
           >
-            close and save
+            Close and Save
           </button>
         </div>
       </div>
