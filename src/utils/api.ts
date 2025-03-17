@@ -4,13 +4,11 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 export const baseURL = EXPRESS_VERSION_URL
-// Set base URL for API requests
 const api = axios.create({
   baseURL: baseURL,
-  withCredentials: true, // This is important for sending cookies with requests
+  withCredentials: true,
 });
 
-// Interceptor to include the access token in request headers
 api.interceptors.request.use((config) => {
   const accessToken = Cookies.get("accessToken");
   if (accessToken) {
@@ -19,7 +17,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle token refresh automatically
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -31,7 +28,7 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       await refreshAccessToken();
-      return api(originalRequest); // Retry the original request
+      return api(originalRequest);
     }
     return Promise.reject(error);
   }
@@ -39,8 +36,8 @@ api.interceptors.response.use(
 
 const refreshAccessToken = async () => {
   try {
-    const response = await api.post("/auth/refresh-token");
-    Cookies.set("accessToken", response.data.data.accessToken); // Save new access token
+    const response = await api.post("/auth/refresh-token", {}, { withCredentials: true });
+    Cookies.set("accessToken", response.data.data.accessToken);
   } catch (error) {
     console.error("Error refreshing access token", error);
   }

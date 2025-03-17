@@ -10,7 +10,7 @@ const Logout = () => {
     const { dispatch} = useAuthContext();
     const handleLogout = async () => {
         try {
-          const res = await api.post('/auth/logout');
+          const res = await api.post('/auth/logout' , {}, { withCredentials: true });
           console.log(res)
           toast.success('Logout successful');
           dispatch({ type: 'LOGOUT' });
