@@ -6,12 +6,14 @@ import Cookies from "js-cookie";
 import Link from "next/link";
 import { useAuthContext } from "@/context/AuthContext";
 import toast from "react-hot-toast";
-import { AuthErrorType } from "@/lib/ErrorType";
+import { CustomErrorType } from "@/lib/ErrorType";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { dispatch } = useAuthContext();
 
@@ -19,10 +21,12 @@ const Login = () => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       const response = await api.post("/auth/login", { email, password });
       const { accessToken } = response.data.data;
       Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'Strict' });
       toast.success("Login successful");
+      router.push("/");
       dispatch({ 
         type: 'SET_AUTH',
         payload: {
@@ -30,15 +34,11 @@ const Login = () => {
           id: response.data.data._id
         }
       });
-      router.push("/");
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message || "Something went wrong");
-        toast.error(err.message || "Something went wrong");
-      } else {
-        setError((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
-        toast.error((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
-      }
+      setError((err as CustomErrorType).response?.data?.message || "Something went wrong");
+      toast.error((err as CustomErrorType).response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -65,9 +65,9 @@ const Login = () => {
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full py-3 mt-4 bg-[#5f27cd] text-white rounded-md hover:bg-[#4e18ba] focus:outline-none"
+            className="w-full py-[10px] mt-4 bg-[#5f27cd] text-white rounded-md hover:bg-[#4e18ba] focus:outline-none"
           >
-            Login
+             {loading ? <LoadingSpinner className="text-white w-5 h-5" /> : "Login"}
           </button>
         </form>
         <Link href="/auth/signup" className="text-[#5f27cd] mt-4 block text-center hover:underline">

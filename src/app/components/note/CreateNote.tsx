@@ -70,7 +70,7 @@ const CreateNote = () => {
             loading ? 'bg-gray-500' : 'bg-[#5f27cd] hover:bg-[#4e18ba]'
           } focus:outline-none focus:ring-2 focus:ring-[#5f27cd] focus:ring-opacity-50`}
         >
-          {loading ? <LoadingSpinner className="w-5 h-5 mr-2" /> : 'Save Note'}
+          {loading ? <LoadingSpinner className="w-5 h-5" /> : 'Save Note'}
         </button>
       </form>
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}

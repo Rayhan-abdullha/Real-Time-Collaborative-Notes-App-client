@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { AuthErrorType } from "@/lib/ErrorType";
+import { CustomErrorType } from "@/lib/ErrorType";
 import toast from "react-hot-toast";
 
 const Signup = () => {
@@ -30,16 +30,11 @@ const Signup = () => {
       setLoading(true);
       const response = await api.post("/auth/register", { email, password, name });
       toast.success("Signup successful");
-      Cookies.set("accessToken", response.data.data.accessToken);
       router.push("/");
+      Cookies.set("accessToken", response.data.data.accessToken);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message || "Something went wrong");
-        toast.error(err.message || "Something went wrong");
-      } else {
-        setError((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
-        toast.error((err as AuthErrorType).response?.data?.details[0].message || "Something went wrong");
-      }
+      setError((err as CustomErrorType).response?.data?.message || "Something went wrong");
+      toast.error((err as CustomErrorType).response?.data.message || "Something went wrong");
     }
     finally {
       setLoading(false);
@@ -55,7 +50,7 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Name"
-              name="name"  // Add name attribute here
+              name="name"
               value={state.name}
               onChange={handleChange}
               required
@@ -64,7 +59,7 @@ const Signup = () => {
             <input
               type="email"
               placeholder="Email"
-              name="email"  // Add name attribute here
+              name="email"
               value={state.email}
               onChange={handleChange}
               required
@@ -73,7 +68,7 @@ const Signup = () => {
             <input
               type="password"
               placeholder="Password"
-              name="password"  // Add name attribute here
+              name="password" 
               value={state.password}
               onChange={handleChange}
               required
@@ -82,9 +77,9 @@ const Signup = () => {
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full py-3 mt-4 bg-[#5f27cd] text-white rounded-md cursor-pointer hover:bg-[#4e18ba] focus:outline-none"
+            className="w-full py-[10px] mt-4 bg-[#5f27cd] text-white rounded-md cursor-pointer hover:bg-[#4e18ba] focus:outline-none"
           >
-            {loading ? <LoadingSpinner className="text-white w-7 h-7" /> : "Sign Up"}
+            {loading ? <LoadingSpinner className="text-white w-5 h-5" /> : "Sign Up"}
           </button>
         </form>
         <Link href="/auth/login" className="text-[#5f27cd] mt-4 block text-center hover:underline">
