@@ -15,8 +15,16 @@ Build a real-time collaborative notes app where multiple users can create, edit,
    # Install dependencies
    npm install
 
-   # Start the server
-   npm  run dev
+```
+
+```
+   - go to config file and open .env
+   - comment product url
+   - uncomment localhost url
+```
+
+```
+   npm run dev
 ```
 
 ## Frontend (React, Tailwind CSS, WebSocket) 

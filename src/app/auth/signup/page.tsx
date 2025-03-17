@@ -30,8 +30,9 @@ const Signup = () => {
       setLoading(true);
       const response = await api.post("/auth/register", { email, password, name } , { withCredentials: true });
       toast.success("Signup successful");
-      router.replace("/");
       Cookies.set("accessToken", response.data.data.accessToken);
+      window.location.reload();
+      router.push('/auth/login')
     } catch (err: unknown) {
       setError((err as CustomErrorType).response?.data?.message || "Something went wrong");
       toast.error((err as CustomErrorType).response?.data.message || "Something went wrong");
