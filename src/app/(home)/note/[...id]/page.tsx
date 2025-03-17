@@ -83,7 +83,7 @@ function NoteDetails() {
         <div className="flex justify-end space-x-4">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-white bg-blue-100 rounded-lg transition-all duration-300 hover:bg-blue-600"
+            className="px-4 py-2 text-sm font-medium text-purple-600 hover:text-white bg-purple-100 rounded-lg transition-all duration-300 hover:bg-[#5f27cd]"
           >
             Edit Note
           </button>
