@@ -16,9 +16,8 @@ function NoteDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
-  const params = useParams();
-  const id = params.id as string;
-  const noteId = id ? id[1] : "";
+  const {id} = useParams();
+  const noteId = id ? id[0] : "";
 
   useEffect(() => {
     if (!noteId) return;

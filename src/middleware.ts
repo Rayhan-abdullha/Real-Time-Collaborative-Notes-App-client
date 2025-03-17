@@ -6,7 +6,7 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (
-    (pathname === "/" || pathname.startsWith("/profile") || pathname.startsWith("/notes")) &&
+    (pathname === "/" || pathname.startsWith("/profile") || pathname.startsWith("/notes") || pathname.startsWith("/createNote")) &&
     !accessToken
   ) {
     return NextResponse.redirect(new URL("/auth/login", req.url));

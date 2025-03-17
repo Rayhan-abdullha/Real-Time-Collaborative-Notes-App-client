@@ -28,9 +28,7 @@ const Profile = ({isMobile}: {isMobile?: boolean}) => {
                 </Link>
                 <Logout/>
             </div>
-            
         }
-        
     </>
   )
 }
