@@ -4,7 +4,6 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   const accessToken = req.cookies.get("accessToken")?.value;
   const { pathname } = req.nextUrl;
-
   if (
     (pathname === "/" || pathname.startsWith("/profile") || pathname.startsWith("/notes") || pathname.startsWith("/createNote")) &&
     !accessToken

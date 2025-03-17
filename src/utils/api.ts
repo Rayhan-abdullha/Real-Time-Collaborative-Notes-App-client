@@ -1,4 +1,3 @@
-// app/utils/api.ts
 import { EXPRESS_VERSION_URL } from "@/config";
 import axios from "axios";
 import Cookies from "js-cookie";
