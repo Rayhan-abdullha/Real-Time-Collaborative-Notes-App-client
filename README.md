@@ -1,5 +1,6 @@
 # Real-Time Collaborative Notes App
 
+#### Live link - https://my-notes-io.vercel.app/
 ### Objective
 
 Build a real-time collaborative notes app where multiple users can create, edit, and view notes in real-time. Implement JWT-based authentication with access & refresh tokens for secure access and session management. The project utilizes React, WebSocket (Socket.io), Express.js, Node.js, MongoDB, and Tailwind CSS.
