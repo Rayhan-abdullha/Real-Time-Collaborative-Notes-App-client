@@ -24,7 +24,7 @@ const Profile = () => {
   }, []);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 py-6 px-4">
+    <div className="max-w-4xl mx-auto p-8 bg-gray-50 flex justify-center items-center min-h-[80vh]">
       <div className="w-full max-w-lg bg-white p-10 rounded-xl shadow-xl ring-1 ring-gray-200 space-y-6">
         <div className="flex justify-center">
           <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-semibold">
