@@ -26,7 +26,7 @@ const Login = () => {
       const { accessToken } = response.data.data;
       Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'Strict' });
       toast.success("Login successful");
-      router.push("/");
+      router.replace("/");
       dispatch({ 
         type: 'SET_AUTH',
         payload: {
