@@ -29,10 +29,14 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         isAuthenticated: true,
       };
       case 'LOGOUT':
-          const token = Cookies.get('accessToken');
+      const token = Cookies.get('accessToken');
+      const refreshToken = Cookies.get('refreshToken');
           if (token) {
               Cookies.remove('accessToken');
-          }
+      }
+      if (refreshToken) {
+          Cookies.remove('refreshToken');
+      }
           return initialState;
     default:
       return state;
