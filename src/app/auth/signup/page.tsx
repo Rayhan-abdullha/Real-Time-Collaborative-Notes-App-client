@@ -28,7 +28,7 @@ const Signup = () => {
     const { email, password, name } = state;
     try {
       setLoading(true);
-      const response = await api.post("/auth/register", { email, password, name });
+      const response = await api.post("/auth/register", { email, password, name } , { withCredentials: true });
       toast.success("Signup successful");
       router.push("/");
       Cookies.set("accessToken", response.data.data.accessToken);

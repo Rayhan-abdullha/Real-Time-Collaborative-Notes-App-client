@@ -22,7 +22,7 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const response = await api.post("/auth/login", { email, password });
+      const response = await api.post("/auth/login", { email, password }, { withCredentials: true });
       const { accessToken } = response.data.data;
       Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'Strict' });
       toast.success("Login successful");
