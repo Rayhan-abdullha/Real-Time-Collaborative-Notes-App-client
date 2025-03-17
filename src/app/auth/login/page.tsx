@@ -30,7 +30,7 @@ const Login = () => {
           id: response.data.data._id
         }
       });
-      router.push("/profile");
+      router.push("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Something went wrong");
